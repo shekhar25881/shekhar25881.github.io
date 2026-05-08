@@ -1,49 +1,409 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-
-        input {
-            padding: 8px;
-            margin-right: 10px;
-        }
-
-        button {
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-
-        h2 {
-            margin-top: 20px;
-            color: #333;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trade Journal — Minervini Methodology</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Mono', 'Courier New', monospace; background: #0a0b0e; min-height: 100vh; color: #e8e4d9; }
+  ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #0a0b0e; } ::-webkit-scrollbar-thumb { background: #2a2d35; }
+  input, select, textarea { background: #111318; border: 1px solid #1e2128; color: #e8e4d9; padding: 8px 12px; font-family: inherit; font-size: 12px; border-radius: 2px; width: 100%; outline: none; transition: border-color .2s; }
+  input:focus, select:focus, textarea:focus { border-color: #c9a84c; }
+  select option { background: #111318; }
+  .btn { cursor: pointer; border: none; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; transition: all .15s; }
+  .btn-primary { background: #c9a84c; color: #0a0b0e; padding: 9px 20px; font-size: 13px; font-weight: 600; }
+  .btn-primary:hover { background: #e0c060; }
+  .btn-ghost { background: transparent; color: #c9a84c; padding: 9px 20px; font-size: 12px; border: 1px solid #c9a84c22; }
+  .btn-ghost:hover { border-color: #c9a84c; background: #c9a84c11; }
+  .btn-danger { background: transparent; color: #e05555; padding: 6px 12px; font-size: 11px; border: 1px solid #e0555522; }
+  .btn-danger:hover { background: #e0555511; border-color: #e05555; }
+  .card { background: #111318; border: 1px solid #1e2128; border-radius: 3px; padding: 20px; }
+  .label { font-size: 10px; color: #5a5f6e; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px; }
+  .tag { display: inline-block; padding: 3px 8px; font-size: 10px; border-radius: 2px; letter-spacing: .8px; }
+  .tag-open { background: #1a2a1a; color: #4caf50; border: 1px solid #4caf5033; }
+  .tag-win { background: #1a2a1a; color: #4caf50; border: 1px solid #4caf5033; }
+  .tag-loss { background: #2a1a1a; color: #e05555; border: 1px solid #e0555533; }
+  .tag-stopped { background: #2a1a1a; color: #e05555; border: 1px solid #e0555533; }
+  .tag-scratched { background: #2a1e10; color: #c9a84c; border: 1px solid #c9a84c33; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .col { flex: 1; min-width: 140px; }
+  .col2 { flex: 2; min-width: 200px; }
+  .stat-card { background: #111318; border: 1px solid #1e2128; padding: 18px 22px; border-radius: 3px; }
+  .divider { border: none; border-top: 1px solid #1e2128; margin: 20px 0; }
+  .trade-row { display: grid; grid-template-columns: 90px 80px 1fr 110px 80px 80px 80px 80px 90px 90px; gap: 1px; background: #1e2128; padding: 0; border-bottom: 1px solid #1e2128; }
+  .trade-row > div { background: #0d0e12; padding: 10px 12px; font-size: 11px; display: flex; align-items: center; }
+  .trade-row:hover > div { background: #111318; }
+  .trade-head { color: #5a5f6e; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  .pnl-pos { color: #4caf50; }
+  .pnl-neg { color: #e05555; }
+  .section-title { font-family: 'Bebas Neue', cursive; font-size: 22px; letter-spacing: 2px; color: #c9a84c; margin-bottom: 16px; }
+  .nav-item { cursor: pointer; padding: 10px 16px; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #5a5f6e; transition: color .15s; border-bottom: 2px solid transparent; display: inline-block; }
+  .nav-item:hover { color: #c9a84c; }
+  .nav-item.active { color: #c9a84c; border-bottom-color: #c9a84c; }
+  textarea { resize: vertical; min-height: 70px; }
+  .form-section-title { font-size: 10px; color: #c9a84c88; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #1e2128; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .sepa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .sepa-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #0d0e12; border-radius: 2px; font-size: 11px; color: #8a8f9e; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .header { border-bottom: 1px solid #1e2128; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
+  .content { padding: 28px; max-width: 1300px; margin: 0 auto; }
+  .empty-state { text-align: center; padding: 60px 0; color: #2a2d35; }
+  .empty-title { font-family: 'Bebas Neue', cursive; font-size: 36px; letter-spacing: 4px; }
+  .rr-display { background: #0d0e12; padding: 12px 14px; border-radius: 2px; display: flex; gap: 24px; }
+  .bebas { font-family: 'Bebas Neue', cursive; }
+  .mb12 { margin-bottom: 12px; }
+  .mb16 { margin-bottom: 16px; }
+  @media (max-width: 700px) { .trade-row { grid-template-columns: 80px 70px 1fr 80px 70px; } .form-grid { grid-template-columns: 1fr; } }
+</style>
 </head>
 <body>
 
-    <h1>Hello World App</h1>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:16px">
+    <div>
+      <div class="bebas" style="font-size:26px;letter-spacing:4px;color:#c9a84c;line-height:1">TRADE JOURNAL</div>
+      <div style="font-size:9px;color:#5a5f6e;letter-spacing:3px;margin-top:2px">MINERVINI METHODOLOGY</div>
+    </div>
+  </div>
+  <div id="nav"></div>
+</div>
 
-    <input type="text" id="nameInput" placeholder="Enter your name" />
-    <button onclick="showGreeting()">Submit</button>
+<div class="content" id="app"></div>
 
-    <h2 id="greeting"></h2>
+<script>
+const SETUP_TYPES = [
+  "VCP (Volatility Contraction Pattern)", "Breakout from Base", "Power Trend",
+  "Pocket Pivot", "Follow-Through Day", "Base on Base",
+  "Cup with Handle", "Flat Base", "Other"
+];
+const MARKET_CONDITIONS = ["Uptrend", "Confirmed Uptrend", "Uptrend Under Pressure", "Downtrend", "Mixed"];
+const TRADE_STATUS = ["Open", "Closed - Winner", "Closed - Loser", "Stopped Out", "Scratched"];
+const SECTORS = ["Technology", "Healthcare", "Financials", "Energy", "Consumer Discretionary", "Industrials", "Materials", "Utilities", "Real Estate", "Communication Services", "Consumer Staples"];
+const SEPA_RULES = [
+  "Price above 150 & 200-day MA", "150-day MA above 200-day MA",
+  "200-day MA trending up \u22651 month", "50-day MA above 150 & 200-day MA",
+  "Price above 50-day MA", "Price at least 30% above 52-week low",
+  "Price within 25% of 52-week high", "RS Rating \u2265 70 (IBD)",
+  "EPS growth \u2265 25% YoY", "Revenue growth \u2265 25% YoY",
+  "VCP structure confirmed", "Volume contraction on pullbacks"
+];
 
-    <script>
-        function showGreeting() {
-            const name = document.getElementById("nameInput").value;
-            document.getElementById("greeting").innerText =
-                "Hello, " + (name || "World") + "!";
-        }
-    </script>
+let trades = [];
+let form = emptyTrade();
+let editing = null;
+let view = "dashboard";
+let selectedTrade = null;
+let filterStatus = "All";
 
+function emptyTrade() {
+  return {
+    id: null, date: "", ticker: "", sector: "",
+    setupType: "", marketCondition: "",
+    entryPrice: "", stopLoss: "", target1: "", target2: "",
+    shares: "", positionSize: "",
+    riskReward: "", riskPercent: "",
+    epsGrowth: "", revGrowth: "", rsRating: "",
+    adv: "", floatShares: "",
+    notes: "", status: "Open",
+    exitPrice: "", exitDate: "", pnl: "", pnlPercent: ""
+  };
+}
+
+function calcRR(entry, stop, target) {
+  const e = parseFloat(entry), s = parseFloat(stop), t = parseFloat(target);
+  if (!e || !s || !t || e === s) return "";
+  return ((t - e) / (e - s)).toFixed(2);
+}
+
+function calcRisk(entry, stop, shares) {
+  const e = parseFloat(entry), s = parseFloat(stop), sh = parseFloat(shares);
+  if (!e || !s || !sh) return "";
+  return ((e - s) * sh).toFixed(2);
+}
+
+function calcPnl(entry, exit, shares) {
+  const e = parseFloat(entry), x = parseFloat(exit), sh = parseFloat(shares);
+  if (!e || !x || !sh) return "";
+  return ((x - e) * sh).toFixed(2);
+}
+
+function handleChange(field, value) {
+  form[field] = value;
+  if (["entryPrice", "stopLoss", "target1"].includes(field)) {
+    form.riskReward = calcRR(form.entryPrice, form.stopLoss, form.target1);
+  }
+  if (["entryPrice", "stopLoss", "shares"].includes(field)) {
+    const r = calcRisk(form.entryPrice, form.stopLoss, form.shares);
+    form.positionSize = r;
+    const totalPortfolio = 100000;
+    if (r) form.riskPercent = ((parseFloat(r) / totalPortfolio) * 100).toFixed(2);
+    else form.riskPercent = "";
+  }
+  if (["entryPrice", "exitPrice", "shares"].includes(field)) {
+    form.pnl = calcPnl(form.entryPrice, form.exitPrice, form.shares);
+    const e = parseFloat(form.entryPrice), x = parseFloat(form.exitPrice);
+    if (e && x) form.pnlPercent = (((x - e) / e) * 100).toFixed(2);
+    else form.pnlPercent = "";
+  }
+  render();
+}
+
+function saveTrade() {
+  if (!form.ticker || !form.date) return;
+  if (editing !== null) {
+    trades = trades.map(tr => tr.id === editing ? { ...form, id: editing } : tr);
+    editing = null;
+  } else {
+    trades.push({ ...form, id: Date.now() });
+  }
+  form = emptyTrade();
+  view = "log";
+  render();
+}
+
+function deleteTrade(id) {
+  trades = trades.filter(tr => tr.id !== id);
+  render();
+}
+
+function editTrade(trade) {
+  form = { ...trade };
+  editing = trade.id;
+  view = "add";
+  render();
+}
+
+function setView(v) {
+  view = v;
+  if (v === "add") { form = emptyTrade(); editing = null; }
+  render();
+}
+
+function getStats() {
+  const closed = trades.filter(t => t.status !== "Open" && t.pnl);
+  const winners = closed.filter(t => parseFloat(t.pnl) > 0);
+  const losers = closed.filter(t => parseFloat(t.pnl) <= 0);
+  const totalPnl = closed.reduce((s, t) => s + parseFloat(t.pnl || 0), 0);
+  const winRate = closed.length ? ((winners.length / closed.length) * 100).toFixed(1) : 0;
+  const avgWin = winners.length ? (winners.reduce((s, t) => s + parseFloat(t.pnl), 0) / winners.length).toFixed(2) : 0;
+  const avgLoss = losers.length ? (losers.reduce((s, t) => s + parseFloat(t.pnl), 0) / losers.length).toFixed(2) : 0;
+  const expectancy = closed.length ? ((winners.length / closed.length * parseFloat(avgWin)) + (losers.length / closed.length * parseFloat(avgLoss))).toFixed(2) : 0;
+  return { totalPnl, winRate, avgWin, avgLoss, expectancy, totalTrades: trades.length, closedTrades: closed.length };
+}
+
+function esc(str) {
+  const d = document.createElement("div");
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+function options(arr, selected, placeholder) {
+  let html = placeholder ? `<option value="">${esc(placeholder)}</option>` : "";
+  arr.forEach(v => { html += `<option${v === selected ? " selected" : ""}>${esc(v)}</option>`; });
+  return html;
+}
+
+function tagClass(status) {
+  if (status === "Open") return "tag-open";
+  if (status.includes("Winner")) return "tag-win";
+  if (status === "Scratched") return "tag-scratched";
+  return "tag-loss";
+}
+
+function renderNav() {
+  const nav = document.getElementById("nav");
+  nav.innerHTML = ["dashboard", "log", "add"].map(v =>
+    `<span class="nav-item ${view === v ? "active" : ""}" onclick="setView('${v}')">${v === "add" ? "+ New Trade" : v.charAt(0).toUpperCase() + v.slice(1)}</span>`
+  ).join("");
+}
+
+function renderDashboard() {
+  const stats = getStats();
+  const statItems = [
+    { label: "Total P&L", value: `$${parseFloat(stats.totalPnl).toFixed(2)}`, color: stats.totalPnl >= 0 ? "#4caf50" : "#e05555" },
+    { label: "Win Rate", value: `${stats.winRate}%`, color: "#c9a84c" },
+    { label: "Avg Winner", value: `$${stats.avgWin}`, color: "#4caf50" },
+    { label: "Avg Loser", value: `$${stats.avgLoss}`, color: "#e05555" },
+    { label: "Expectancy", value: `$${stats.expectancy}`, color: parseFloat(stats.expectancy) >= 0 ? "#4caf50" : "#e05555" },
+    { label: "Total Trades", value: stats.totalTrades, color: "#e8e4d9" }
+  ];
+
+  let html = `<div class="section-title">Performance Dashboard</div>`;
+  html += `<div class="stats-grid">`;
+  statItems.forEach(s => {
+    html += `<div class="stat-card"><div class="label">${esc(s.label)}</div><div class="bebas" style="font-size:24px;letter-spacing:1px;color:${s.color};margin-top:4px">${esc(String(s.value))}</div></div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="card mb16"><div class="form-section-title" style="margin-bottom:14px">Minervini's SEPA Checklist</div><div class="sepa-grid">`;
+  SEPA_RULES.forEach(rule => {
+    html += `<div class="sepa-item"><span style="color:#c9a84c;font-size:10px">&#9670;</span> ${esc(rule)}</div>`;
+  });
+  html += `</div></div>`;
+
+  if (trades.length === 0) {
+    html += `<div class="empty-state"><div class="empty-title">No Trades Logged</div><div style="font-size:12px;margin-top:8px">Click "+ New Trade" to begin your journal</div><button class="btn btn-primary" style="margin-top:16px" onclick="setView('add')">+ Log First Trade</button></div>`;
+  }
+  return html;
+}
+
+function renderLog() {
+  const filtered = filterStatus === "All" ? trades : trades.filter(t => t.status === filterStatus);
+  let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">`;
+  html += `<div class="section-title" style="margin:0">Trade Log</div>`;
+  html += `<div style="display:flex;gap:8px;align-items:center">`;
+  html += `<select onchange="filterStatus=this.value;render()" style="width:auto;min-width:150px"><option>All</option>${options(TRADE_STATUS, filterStatus)}</select>`;
+  html += `<button class="btn btn-primary" onclick="form=emptyTrade();editing=null;view='add';render()">+ New Trade</button>`;
+  html += `</div></div>`;
+
+  if (filtered.length === 0) {
+    html += `<div style="text-align:center;padding:60px;color:#2a2d35;font-size:13px">No trades found</div>`;
+  } else {
+    html += `<div style="overflow:auto">`;
+    html += `<div class="trade-row trade-head" style="background:transparent">`;
+    ["Date","Ticker","Setup","Entry","Stop","Target","R:R","P&L","Status","Actions"].forEach(h => {
+      html += `<div style="background:#0a0b0e">${h}</div>`;
+    });
+    html += `</div>`;
+    filtered.forEach(trade => {
+      const pnlVal = parseFloat(trade.pnl || 0);
+      const pnlClass = pnlVal > 0 ? "pnl-pos" : pnlVal < 0 ? "pnl-neg" : "";
+      const tc = tagClass(trade.status);
+      const statusLabel = trade.status.split(" - ")[1] || trade.status;
+      html += `<div class="trade-row" style="cursor:pointer" onclick="selectedTrade=trades.find(t=>t.id===${trade.id});view='detail';render()">`;
+      html += `<div>${esc(trade.date)}</div>`;
+      html += `<div style="font-weight:500;color:#c9a84c">${esc(trade.ticker)}</div>`;
+      html += `<div style="color:#8a8f9e;font-size:10px">${esc((trade.setupType || "").split("(")[0])}</div>`;
+      html += `<div>$${parseFloat(trade.entryPrice || 0).toFixed(2)}</div>`;
+      html += `<div style="color:#e05555">$${parseFloat(trade.stopLoss || 0).toFixed(2)}</div>`;
+      html += `<div style="color:#4caf50">$${parseFloat(trade.target1 || 0).toFixed(2)}</div>`;
+      html += `<div style="color:#c9a84c">${trade.riskReward ? trade.riskReward + "R" : "\u2014"}</div>`;
+      html += `<div class="${pnlClass}">${trade.pnl ? "$" + pnlVal.toFixed(2) : "\u2014"}</div>`;
+      html += `<div onclick="event.stopPropagation()"><span class="tag ${tc}">${esc(statusLabel)}</span></div>`;
+      html += `<div style="gap:6px;display:flex" onclick="event.stopPropagation()"><button class="btn btn-ghost" style="padding:4px 10px;font-size:10px" onclick="editTrade(trades.find(t=>t.id===${trade.id}))">Edit</button><button class="btn btn-danger" onclick="deleteTrade(${trade.id});render()">&#10005;</button></div>`;
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderAddEdit() {
+  const title = editing ? "Edit Trade" : "Log New Trade";
+  let html = `<div class="section-title">${title}</div><div class="form-grid">`;
+
+  // Left column
+  html += `<div>`;
+  html += `<div class="card mb16"><div class="form-section-title">Trade Setup</div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">Date</div><input type="date" value="${esc(form.date)}" onchange="handleChange('date',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Ticker Symbol</div><input placeholder="AAPL" value="${esc(form.ticker)}" oninput="handleChange('ticker',this.value.toUpperCase())"></div></div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">Sector</div><select onchange="handleChange('sector',this.value)">${options(SECTORS, form.sector, "Select...")}</select></div>`;
+  html += `<div class="col"><div class="label">Market Condition</div><select onchange="handleChange('marketCondition',this.value)">${options(MARKET_CONDITIONS, form.marketCondition, "Select...")}</select></div></div>`;
+  html += `<div class="mb12"><div class="label">Setup Type (Minervini Pattern)</div><select onchange="handleChange('setupType',this.value)">${options(SETUP_TYPES, form.setupType, "Select...")}</select></div>`;
+  html += `</div>`;
+
+  html += `<div class="card mb16"><div class="form-section-title">Entry & Risk Parameters</div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">Entry Price ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.entryPrice)}" oninput="handleChange('entryPrice',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Stop Loss ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.stopLoss)}" oninput="handleChange('stopLoss',this.value)"></div></div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">Target 1 ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.target1)}" oninput="handleChange('target1',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Target 2 ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.target2)}" oninput="handleChange('target2',this.value)"></div></div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">Shares</div><input type="number" placeholder="0" value="${esc(form.shares)}" oninput="handleChange('shares',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Risk $ (auto)</div><input readonly value="${form.positionSize ? "$" + form.positionSize : ""}" style="color:#e05555" placeholder="Auto-calc"></div></div>`;
+
+  if (form.riskReward) {
+    html += `<div class="rr-display"><div><div class="label">Risk:Reward</div><div class="bebas" style="color:#c9a84c;font-size:18px;letter-spacing:1px">1 : ${esc(form.riskReward)}R</div></div>`;
+    if (form.riskPercent) {
+      html += `<div><div class="label">% Risk (of $100k)</div><div class="bebas" style="color:${parseFloat(form.riskPercent) > 2 ? "#e05555" : "#4caf50"};font-size:18px">${esc(form.riskPercent)}%</div></div>`;
+    }
+    html += `</div>`;
+  }
+  html += `</div></div>`;
+
+  // Right column
+  html += `<div>`;
+  html += `<div class="card mb16"><div class="form-section-title">Fundamental Criteria (SEPA)</div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">EPS Growth %</div><input type="number" placeholder="\u226525%" value="${esc(form.epsGrowth)}" oninput="handleChange('epsGrowth',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Revenue Growth %</div><input type="number" placeholder="\u226525%" value="${esc(form.revGrowth)}" oninput="handleChange('revGrowth',this.value)"></div></div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">RS Rating (IBD)</div><input type="number" placeholder="\u226570" value="${esc(form.rsRating)}" oninput="handleChange('rsRating',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Avg Daily Volume</div><input placeholder="e.g. 1.2M" value="${esc(form.adv)}" oninput="handleChange('adv',this.value)"></div></div>`;
+  html += `<div><div class="label">Float (shares)</div><input placeholder="e.g. 50M" value="${esc(form.floatShares)}" oninput="handleChange('floatShares',this.value)"></div>`;
+  html += `</div>`;
+
+  html += `<div class="card mb16"><div class="form-section-title">Exit & Result</div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">Exit Date</div><input type="date" value="${esc(form.exitDate)}" onchange="handleChange('exitDate',this.value)"></div>`;
+  html += `<div class="col"><div class="label">Exit Price ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.exitPrice)}" oninput="handleChange('exitPrice',this.value)"></div></div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">P&L $ (auto)</div><input readonly value="${form.pnl ? "$" + parseFloat(form.pnl).toFixed(2) : ""}" style="color:${parseFloat(form.pnl) >= 0 ? "#4caf50" : "#e05555"}" placeholder="Auto-calc"></div>`;
+  html += `<div class="col"><div class="label">P&L % (auto)</div><input readonly value="${form.pnlPercent ? form.pnlPercent + "%" : ""}" style="color:${parseFloat(form.pnlPercent) >= 0 ? "#4caf50" : "#e05555"}" placeholder="Auto-calc"></div></div>`;
+  html += `<div><div class="label">Trade Status</div><select onchange="handleChange('status',this.value)">${options(TRADE_STATUS, form.status)}</select></div>`;
+  html += `</div>`;
+
+  html += `<div class="card"><div class="form-section-title">Trade Notes & Thesis</div>`;
+  html += `<textarea placeholder="Why did you take this trade? What was the catalyst? VCP tightness? Volume analysis? Note your reasoning, emotions, and lessons learned..." oninput="handleChange('notes',this.value)" style="min-height:90px">${esc(form.notes)}</textarea>`;
+  html += `</div></div>`;
+
+  html += `</div>`;
+  html += `<div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end">`;
+  html += `<button class="btn btn-ghost" onclick="form=emptyTrade();editing=null;view='log';render()">Cancel</button>`;
+  html += `<button class="btn btn-primary" onclick="saveTrade()">${editing ? "Update Trade" : "Save Trade"}</button>`;
+  html += `</div>`;
+  return html;
+}
+
+function renderDetail() {
+  const t = selectedTrade;
+  if (!t) return "";
+  let html = `<button class="btn btn-ghost" style="margin-bottom:20px" onclick="view='log';render()">\u2190 Back to Log</button>`;
+  html += `<div style="display:flex;align-items:center;gap:14px;margin-bottom:24px">`;
+  html += `<div class="bebas" style="font-size:40px;letter-spacing:3px;color:#c9a84c">${esc(t.ticker)}</div>`;
+  html += `<span class="tag ${tagClass(t.status)}">${esc(t.status)}</span>`;
+  html += `<span style="color:#5a5f6e;font-size:12px">${esc(t.date)}</span></div>`;
+
+  const items = [
+    { label: "Entry Price", value: `$${parseFloat(t.entryPrice || 0).toFixed(2)}`, color: "#e8e4d9" },
+    { label: "Stop Loss", value: `$${parseFloat(t.stopLoss || 0).toFixed(2)}`, color: "#e05555" },
+    { label: "Target 1", value: `$${parseFloat(t.target1 || 0).toFixed(2)}`, color: "#4caf50" },
+    { label: "Risk:Reward", value: t.riskReward ? `1:${t.riskReward}R` : "\u2014", color: "#c9a84c" },
+    { label: "Shares", value: t.shares || "\u2014", color: "#e8e4d9" },
+    { label: "Risk $", value: t.positionSize ? `$${t.positionSize}` : "\u2014", color: "#e05555" },
+    { label: "P&L", value: t.pnl ? `$${parseFloat(t.pnl).toFixed(2)}` : "\u2014", color: parseFloat(t.pnl) >= 0 ? "#4caf50" : "#e05555" },
+    { label: "P&L %", value: t.pnlPercent ? `${t.pnlPercent}%` : "\u2014", color: parseFloat(t.pnlPercent) >= 0 ? "#4caf50" : "#e05555" },
+    { label: "Setup", value: (t.setupType || "").split("(")[0] || "\u2014", color: "#e8e4d9" },
+    { label: "EPS Growth", value: t.epsGrowth ? `${t.epsGrowth}%` : "\u2014", color: parseFloat(t.epsGrowth) >= 25 ? "#4caf50" : "#e05555" },
+    { label: "Rev Growth", value: t.revGrowth ? `${t.revGrowth}%` : "\u2014", color: parseFloat(t.revGrowth) >= 25 ? "#4caf50" : "#e05555" },
+    { label: "RS Rating", value: t.rsRating || "\u2014", color: parseFloat(t.rsRating) >= 70 ? "#4caf50" : "#e05555" }
+  ];
+
+  html += `<div class="detail-grid">`;
+  items.forEach(item => {
+    html += `<div class="stat-card"><div class="label">${esc(item.label)}</div><div class="bebas" style="color:${item.color};font-size:20px;letter-spacing:1px;margin-top:4px">${esc(String(item.value))}</div></div>`;
+  });
+  html += `</div>`;
+
+  if (t.notes) {
+    html += `<div class="card" style="margin-top:16px"><div class="form-section-title">Trade Notes</div><div style="font-size:12px;color:#8a8f9e;line-height:1.7;white-space:pre-wrap">${esc(t.notes)}</div></div>`;
+  }
+
+  html += `<div style="display:flex;gap:10px;margin-top:18px">`;
+  html += `<button class="btn btn-primary" onclick="editTrade(trades.find(t=>t.id===${t.id}))">Edit Trade</button>`;
+  html += `<button class="btn btn-danger" style="padding:9px 20px" onclick="deleteTrade(${t.id});view='log';render()">Delete Trade</button>`;
+  html += `</div>`;
+  return html;
+}
+
+function render() {
+  renderNav();
+  const app = document.getElementById("app");
+  if (view === "dashboard") app.innerHTML = renderDashboard();
+  else if (view === "log") app.innerHTML = renderLog();
+  else if (view === "add") app.innerHTML = renderAddEdit();
+  else if (view === "detail") app.innerHTML = renderDetail();
+}
+
+render();
+</script>
 </body>
 </html>
-```
