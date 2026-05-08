@@ -149,7 +149,31 @@ function handleChange(field, value) {
     if (e && x) form.pnlPercent = (((x - e) / e) * 100).toFixed(2);
     else form.pnlPercent = "";
   }
-  render();
+  updateCalcFields();
+}
+
+function updateCalcFields() {
+  // Update only the auto-calculated readonly fields and the R:R display without re-rendering
+  const riskEl = document.getElementById("calc-risk");
+  if (riskEl) riskEl.value = form.positionSize ? "$" + form.positionSize : "";
+  const pnlEl = document.getElementById("calc-pnl");
+  if (pnlEl) { pnlEl.value = form.pnl ? "$" + parseFloat(form.pnl).toFixed(2) : ""; pnlEl.style.color = parseFloat(form.pnl) >= 0 ? "#4caf50" : "#e05555"; }
+  const pnlPctEl = document.getElementById("calc-pnlpct");
+  if (pnlPctEl) { pnlPctEl.value = form.pnlPercent ? form.pnlPercent + "%" : ""; pnlPctEl.style.color = parseFloat(form.pnlPercent) >= 0 ? "#4caf50" : "#e05555"; }
+  const rrBox = document.getElementById("calc-rr-box");
+  if (rrBox) {
+    if (form.riskReward) {
+      let html = '<div><div class="label">Risk:Reward</div><div class="bebas" style="color:#c9a84c;font-size:18px;letter-spacing:1px">1 : ' + esc(form.riskReward) + 'R</div></div>';
+      if (form.riskPercent) {
+        html += '<div><div class="label">% Risk (of $100k)</div><div class="bebas" style="color:' + (parseFloat(form.riskPercent) > 2 ? "#e05555" : "#4caf50") + ';font-size:18px">' + esc(form.riskPercent) + '%</div></div>';
+      }
+      rrBox.innerHTML = html;
+      rrBox.style.display = "flex";
+    } else {
+      rrBox.innerHTML = "";
+      rrBox.style.display = "none";
+    }
+  }
 }
 
 function saveTrade() {
@@ -300,7 +324,7 @@ function renderAddEdit() {
   html += `<div>`;
   html += `<div class="card mb16"><div class="form-section-title">Trade Setup</div>`;
   html += `<div class="row mb12"><div class="col"><div class="label">Date</div><input type="date" value="${esc(form.date)}" onchange="handleChange('date',this.value)"></div>`;
-  html += `<div class="col"><div class="label">Ticker Symbol</div><input placeholder="AAPL" value="${esc(form.ticker)}" oninput="handleChange('ticker',this.value.toUpperCase())"></div></div>`;
+  html += `<div class="col"><div class="label">Ticker Symbol</div><input placeholder="AAPL" value="${esc(form.ticker)}" oninput="this.value=this.value.toUpperCase();handleChange('ticker',this.value)"></div></div>`;
   html += `<div class="row mb12"><div class="col"><div class="label">Sector</div><select onchange="handleChange('sector',this.value)">${options(SECTORS, form.sector, "Select...")}</select></div>`;
   html += `<div class="col"><div class="label">Market Condition</div><select onchange="handleChange('marketCondition',this.value)">${options(MARKET_CONDITIONS, form.marketCondition, "Select...")}</select></div></div>`;
   html += `<div class="mb12"><div class="label">Setup Type (Minervini Pattern)</div><select onchange="handleChange('setupType',this.value)">${options(SETUP_TYPES, form.setupType, "Select...")}</select></div>`;
@@ -312,15 +336,16 @@ function renderAddEdit() {
   html += `<div class="row mb12"><div class="col"><div class="label">Target 1 ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.target1)}" oninput="handleChange('target1',this.value)"></div>`;
   html += `<div class="col"><div class="label">Target 2 ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.target2)}" oninput="handleChange('target2',this.value)"></div></div>`;
   html += `<div class="row mb12"><div class="col"><div class="label">Shares</div><input type="number" placeholder="0" value="${esc(form.shares)}" oninput="handleChange('shares',this.value)"></div>`;
-  html += `<div class="col"><div class="label">Risk $ (auto)</div><input readonly value="${form.positionSize ? "$" + form.positionSize : ""}" style="color:#e05555" placeholder="Auto-calc"></div></div>`;
+  html += `<div class="col"><div class="label">Risk $ (auto)</div><input id="calc-risk" readonly value="${form.positionSize ? "$" + form.positionSize : ""}" style="color:#e05555" placeholder="Auto-calc"></div></div>`;
 
+  html += `<div id="calc-rr-box" class="rr-display" style="display:${form.riskReward ? "flex" : "none"}">`;
   if (form.riskReward) {
-    html += `<div class="rr-display"><div><div class="label">Risk:Reward</div><div class="bebas" style="color:#c9a84c;font-size:18px;letter-spacing:1px">1 : ${esc(form.riskReward)}R</div></div>`;
+    html += `<div><div class="label">Risk:Reward</div><div class="bebas" style="color:#c9a84c;font-size:18px;letter-spacing:1px">1 : ${esc(form.riskReward)}R</div></div>`;
     if (form.riskPercent) {
       html += `<div><div class="label">% Risk (of $100k)</div><div class="bebas" style="color:${parseFloat(form.riskPercent) > 2 ? "#e05555" : "#4caf50"};font-size:18px">${esc(form.riskPercent)}%</div></div>`;
     }
-    html += `</div>`;
   }
+  html += `</div>`;
   html += `</div></div>`;
 
   // Right column
@@ -336,8 +361,8 @@ function renderAddEdit() {
   html += `<div class="card mb16"><div class="form-section-title">Exit & Result</div>`;
   html += `<div class="row mb12"><div class="col"><div class="label">Exit Date</div><input type="date" value="${esc(form.exitDate)}" onchange="handleChange('exitDate',this.value)"></div>`;
   html += `<div class="col"><div class="label">Exit Price ($)</div><input type="number" step="0.01" placeholder="0.00" value="${esc(form.exitPrice)}" oninput="handleChange('exitPrice',this.value)"></div></div>`;
-  html += `<div class="row mb12"><div class="col"><div class="label">P&L $ (auto)</div><input readonly value="${form.pnl ? "$" + parseFloat(form.pnl).toFixed(2) : ""}" style="color:${parseFloat(form.pnl) >= 0 ? "#4caf50" : "#e05555"}" placeholder="Auto-calc"></div>`;
-  html += `<div class="col"><div class="label">P&L % (auto)</div><input readonly value="${form.pnlPercent ? form.pnlPercent + "%" : ""}" style="color:${parseFloat(form.pnlPercent) >= 0 ? "#4caf50" : "#e05555"}" placeholder="Auto-calc"></div></div>`;
+  html += `<div class="row mb12"><div class="col"><div class="label">P&L $ (auto)</div><input id="calc-pnl" readonly value="${form.pnl ? "$" + parseFloat(form.pnl).toFixed(2) : ""}" style="color:${parseFloat(form.pnl) >= 0 ? "#4caf50" : "#e05555"}" placeholder="Auto-calc"></div>`;
+  html += `<div class="col"><div class="label">P&L % (auto)</div><input id="calc-pnlpct" readonly value="${form.pnlPercent ? form.pnlPercent + "%" : ""}" style="color:${parseFloat(form.pnlPercent) >= 0 ? "#4caf50" : "#e05555"}" placeholder="Auto-calc"></div></div>`;
   html += `<div><div class="label">Trade Status</div><select onchange="handleChange('status',this.value)">${options(TRADE_STATUS, form.status)}</select></div>`;
   html += `</div>`;
 
